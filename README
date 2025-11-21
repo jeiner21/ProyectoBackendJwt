@@ -1,0 +1,258 @@
+# Homework Management API
+
+API REST para la gestión de tareas y asignaciones con autenticación JWT.
+
+## Tecnologías
+
+- **Java 17**
+- **Spring Boot 3.5.6**
+- **Spring Security** - Autenticación y autorización
+- **JWT (JSON Web Tokens)** - Gestión de tokens
+- **PostgreSQL** - Base de datos
+- **Spring Data JPA** - ORM
+- **Lombok** - Reducción de código boilerplate
+- **Springdoc OpenAPI** - Documentación automática con Swagger
+- **Maven** - Gestión de dependencias
+
+## Características
+
+- Autenticación con JWT
+- CRUD completo de tareas (Homeworks)
+- Registro e inicio de sesión de usuarios
+- Documentación interactiva con Swagger UI
+- Seguridad con Spring Security
+- Encriptación de contraseñas con BCrypt
+- Validación de datos
+- Manejo de errores personalizado
+
+## Requisitos previos
+
+- Java 17 o superior
+- Maven 3.6+
+- PostgreSQL 12+
+- Git
+
+## Instalación
+
+1. **Clonar el repositorio**
+```bash
+git clone https://github.com/tu-usuario/homework-api.git
+cd homework-api
+```
+
+2. **Configurar la base de datos**
+
+Crear una base de datos en PostgreSQL:
+```sql
+CREATE DATABASE homework_db;
+```
+
+3. **Configurar variables de entorno**
+
+Editar `src/main/resources/application.properties`:
+```properties
+spring.datasource.url=jdbc:postgresql://localhost:5432/homework_db
+spring.datasource.username=tu_usuario
+spring.datasource.password=tu_contraseña
+
+jwt.secret=tu_clave_secreta_muy_segura_y_larga
+jwt.expiration=86400000
+
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+```
+
+4. **Instalar dependencias y ejecutar**
+```bash
+mvn clean install
+mvn spring-boot:run
+```
+
+La aplicación estará disponible en: `http://localhost:8080`
+
+## Documentación de la API
+
+Una vez iniciada la aplicación, acceder a:
+- **Swagger UI**: http://localhost:8080/swagger-ui/index.html
+- **OpenAPI JSON**: http://localhost:8080/v3/api-docs
+
+##  Endpoints
+
+### Autenticación (Públicos)
+
+#### Registro de usuario
+```http
+POST /auth/register
+Content-Type: application/json
+
+{
+  "username": "jeiner Pérez",
+  "email": "jeiner@example.com",
+  "password": "password123"
+}
+```
+
+**Respuesta (201 Created):**
+```json
+{
+  "id": 1,
+  "username": "jeiner Pérez",
+  "email": "jeiner@example.com"
+}
+```
+
+#### Inicio de sesión
+```http
+POST /auth/login
+Content-Type: application/json
+
+{
+  "email": "jeiner@example.com",
+  "password": "password123"
+}
+```
+
+**Respuesta (200 OK):**
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "email": "jeiner@example.com",
+  "username": "jeiner Pérez"
+}
+```
+
+---
+
+### Homeworks (Requieren autenticación)
+
+> **Nota:** Todos los endpoints de homeworks requieren el header:
+> ```
+> Authorization: Bearer {token}
+> ```
+
+#### Obtener todas las tareas
+```http
+GET /api/homeworks
+Authorization: Bearer {token}
+```
+
+**Respuesta (200 OK):**
+```json
+[
+  {
+    "id": 1,
+    "title": "Tarea de Matemáticas",
+    "status": "Pendiente",
+    "date": "2025-11-05",
+    "description": "Resolver ejercicios del capítulo 5",
+    "users": {
+      "id": 1,
+      "username": "Jeiner Pérez",
+      "email": "jeiner@example.com"
+    }
+  }
+]
+```
+
+#### Obtener tarea por ID
+```http
+GET /api/homeworks/{id}
+Authorization: Bearer {token}
+```
+
+#### Crear nueva tarea
+```http
+POST /api/homeworks
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "title": "Tarea de Matemáticas",
+  "status": "Pendiente",
+  "date": "2025-11-05",
+  "description": "Resolver ejercicios del capítulo 5",
+  "users": {
+    "id": 1
+  }
+}
+```
+
+**Respuesta (201 Created)**
+
+#### Actualizar tarea
+```http
+PUT /api/homeworks/{id}
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "title": "Tarea Actualizada",
+  "status": "Completada",
+  "date": "2025-11-06",
+  "description": "Ya terminé",
+  "users": {
+    "id": 1
+  }
+}
+```
+
+**Respuesta (200 OK)** si existe, **404 Not Found** si no existe
+
+#### Eliminar tarea
+```http
+DELETE /api/homeworks/{id}
+Authorization: Bearer {token}
+```
+
+**Respuesta (204 No Content)** si existe, **404 Not Found** si no existe
+
+## Estructura del proyecto
+
+```
+src/
+├── main/
+│   ├── java/
+│   │   └── com/project/java/
+│   │       ├── config/          # Configuraciones (Security, JWT, Swagger)
+│   │       ├── controller/      # Controladores REST
+│   │       ├── dto/             # Data Transfer Objects
+│   │       ├── model/           # Entidades JPA
+│   │       ├── repository/      # Repositorios
+│   │       └── service/         # Lógica de negocio
+│   └── resources/
+│       └── application.properties
+└── test/                        # Tests unitarios
+```
+
+## Seguridad
+
+- Las contraseñas se encriptan usando **BCrypt**
+- Los endpoints protegidos requieren **JWT válido**
+- Los tokens tienen una expiración configurable
+- Las contraseñas nunca se exponen en las respuestas
+
+## Probar con Postman
+
+Importar la colección de Postman incluida en el repositorio:
+- Archivo: `Homework_API.postman_collection.json`
+
+## Contribuciones
+
+Las contribuciones son bienvenidas. Por favor:
+1. Fork el proyecto
+2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
+3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
+4. Push a la rama (`git push origin feature/AmazingFeature`)
+5. Abre un Pull Request
+
+## Licencia
+
+Este proyecto está bajo la Licencia MIT.
+
+## Autor
+
+** Jeiner Arenas Perez **
+- GitHub: (https://github.com/jeiner21/proyecto)
+- LinkedIn: (https://www.linkedin.com/in/jeiner-arenas-p%C3%A9rez-b34208327?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app)
+- Email: jeineperezp@gmail.com
+- Telefono: +57 3204387147

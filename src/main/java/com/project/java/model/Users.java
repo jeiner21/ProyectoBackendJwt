@@ -1,5 +1,7 @@
 package com.project.java.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -26,6 +28,7 @@ public class Users {
     @Column(nullable = false)
     @NotBlank(message = "La contraseña es obigatoria")
     @Size(min = 8, message = "La contraseña minimo debe tener 8 caracteres")
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
 }
