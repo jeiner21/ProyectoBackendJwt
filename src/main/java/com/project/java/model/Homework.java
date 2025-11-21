@@ -29,14 +29,13 @@ public class Homework {
     private String title;
 
     @NotEmpty
-    private String Description;
+    private String description;
 
     @NotEmpty
     private String status;
 
     private LocalDate date;
 
-    
     @ManyToOne
     @JoinColumn(name = "user_id")
     private Users users;
